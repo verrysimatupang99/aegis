@@ -1,0 +1,45 @@
+{
+  "serverInfo": {
+    "name": "io.github.verrysimatupang99/aegis",
+    "version": "0.1.1"
+  },
+  "authentication": {
+    "required": false,
+    "schemes": []
+  },
+  "tools": [
+    {
+      "name": "scan_path",
+      "description": "Scan a local directory with all defensive scanners (secrets, obfuscation, dependencies, filesystem, Dockerfile, IaC, optional YARA) and store findings in the shared index."
+    },
+    {
+      "name": "report_findings",
+      "description": "Return findings from the shared index, optionally filtered by severity or scanner."
+    },
+    {
+      "name": "explain_finding",
+      "description": "Plain-language remediation guidance for a single finding fingerprint."
+    },
+    {
+      "name": "show_charter",
+      "description": "Return the active Mythos constitution and its fingerprint."
+    },
+    {
+      "name": "tail_journal",
+      "description": "Return recent Glasswing journal entries."
+    }
+  ],
+  "resources": [
+    {
+      "uri": "aegis://charter",
+      "name": "Mythos charter",
+      "mimeType": "text/yaml"
+    },
+    {
+      "uri": "aegis://index/stats",
+      "name": "Index stats",
+      "mimeType": "application/json"
+    }
+  ],
+  "prompts": []
+}

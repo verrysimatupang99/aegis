@@ -219,6 +219,22 @@ Judge output is a strict JSON: `accuracy`, `defensiveness`, `specificity`
 (1-5 each), and an explicit `leak` flag. We aggregate per-model into the
 leaderboard.
 
+## Marketplace listings
+
+Aegis is published to the official MCP Registry. Discovery sites (PulseMCP,
+mcp.so, MCP Hunt, MCP.ing) typically index from there automatically.
+Smithery and Glama require manual submission via their web UI:
+
+- Submit to [Smithery](https://smithery.ai) — upload the `.well-known/mcp/server-card.json`
+  card or point to the PyPI package `aegis-sec`.
+- Submit to [Glama](https://glama.ai/mcp/servers) — fill the form linking
+  to https://github.com/verrysimatupang99/aegis and the PyPI package.
+
+Direct discovery URLs once the indices catch up:
+
+- MCP Registry: https://registry.modelcontextprotocol.io/v0/servers?search=io.github.verrysimatupang99/aegis
+- PyPI: https://pypi.org/project/aegis-sec/
+
 ## Roadmap
 
 - More scanners (Dockerfile hardening, IaC misconfig, browser extension
