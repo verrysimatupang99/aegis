@@ -22,7 +22,10 @@ from ..core.index import Finding, fingerprint
 from .base import ScanContext
 
 
-CODE_SUFFIXES = {".js", ".mjs", ".cjs", ".ts", ".py", ".sh", ".bash"}
+# This scanner targets JS-family packers/loaders. Python and shell scripts
+# legitimately contain tokens like 'eval(' or 'gunzipSync' as data (e.g. this
+# very scanner's source) so they are intentionally excluded.
+CODE_SUFFIXES = {".js", ".mjs", ".cjs", ".ts"}
 
 DANGER_TOKENS = (
     "eval(", "new Function(", "Function(", "Buffer.from(", "atob(", "btoa(",
@@ -118,7 +121,9 @@ class ObfuscationScanner:
         if ent > 5.5 and longest > LONG_LINE_BYTES:
             signals.append("high_entropy")
 
-        if re.search(r"\.tmp_\$\{.*?\}\.js", data) or "writeFileSync" in data and "unlinkSync" in data:
+        tmp_pattern = re.search(r"\.tmp_\$\{.*?\}\.js", data)
+        write_unlink_pair = ("writeFileSync" in data) and ("unlinkSync" in data)
+        if tmp_pattern or write_unlink_pair:
             signals.append("self_extract")
 
         if "process.execArgv" in data and ("inspect" in data or "NODE_OPTIONS" in data):

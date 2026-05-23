@@ -28,9 +28,35 @@ CURL_PIPE_SH = re.compile(r"(curl|wget)[^\n]*\|\s*(ba)?sh", re.IGNORECASE)
 CHMOD_777 = re.compile(r"chmod\s+(-R\s+)?0?777")
 
 
+CODE_SUFFIXES_NOT_DOCKERFILE = {
+    ".py", ".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs",
+    ".go", ".rs", ".java", ".rb", ".php", ".cs",
+    ".c", ".cpp", ".h", ".hpp", ".swift", ".kt", ".scala",
+    ".md", ".rst", ".txt", ".yaml", ".yml", ".json", ".toml", ".ini",
+}
+
+
 def _looks_like_dockerfile(path: Path) -> bool:
+    """Return True only for files that conventionally are Dockerfiles.
+
+    Dockerfile, Dockerfile.dev, dev.dockerfile -> True
+    dockerfile.py / dockerfile.md / dockerfile.json -> False (those are source
+    code or docs about Dockerfiles, not the build files themselves).
+    """
     name = path.name.lower()
-    return name == "dockerfile" or name.startswith("dockerfile.") or name.endswith(".dockerfile")
+    suffix = path.suffix.lower()
+    if suffix in CODE_SUFFIXES_NOT_DOCKERFILE:
+        return False
+    if name == "dockerfile":
+        return True
+    if suffix == ".dockerfile":
+        return True
+    # 'Dockerfile.<variant>' convention: variant must be short and alpha only,
+    # not a code-file extension.
+    if name.startswith("dockerfile."):
+        variant = name[len("dockerfile."):]
+        return variant.isalpha() and 1 <= len(variant) <= 16
+    return False
 
 
 class DockerfileScanner:

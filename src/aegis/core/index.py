@@ -76,6 +76,8 @@ class Index:
     def __post_init__(self) -> None:
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         with self._conn() as conn:
+            conn.execute("PRAGMA journal_mode=WAL")
+            conn.execute("PRAGMA synchronous=NORMAL")
             conn.executescript(SCHEMA)
             conn.execute(
                 "INSERT OR IGNORE INTO meta(key,value) VALUES(?,?)",

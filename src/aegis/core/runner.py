@@ -88,7 +88,18 @@ def run_scan(
     by_scanner: dict[str, int] = {}
     by_severity: dict[str, int] = {}
     for scanner in scanners or all_scanners():
-        for finding in scanner.scan(ctx):
+        try:
+            scanner_findings = list(scanner.scan(ctx))
+        except Exception as exc:  # noqa: BLE001
+            policy.journal.write(
+                "scan.scanner_error",
+                {
+                    "scanner": getattr(scanner, "name", scanner.__class__.__name__),
+                    "error": str(exc),
+                },
+            )
+            continue
+        for finding in scanner_findings:
             if index.add_finding(finding):
                 added += 1
                 by_scanner[finding.scanner] = by_scanner.get(finding.scanner, 0) + 1
