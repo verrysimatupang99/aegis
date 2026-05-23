@@ -1,0 +1,52 @@
+{
+  "aggregate": {
+    "cases": 3,
+    "tp": 7,
+    "fp": 0,
+    "fn": 0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0
+  },
+  "cases": [
+    {
+      "case": "dependencies_npm",
+      "elapsed_seconds": 0.0291,
+      "files_indexed": 1,
+      "findings_produced": 4,
+      "expected": 4,
+      "true_positives": 4,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    {
+      "case": "obfuscation_loader",
+      "elapsed_seconds": 0.0431,
+      "files_indexed": 2,
+      "findings_produced": 1,
+      "expected": 1,
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    {
+      "case": "secrets_basic",
+      "elapsed_seconds": 0.0224,
+      "files_indexed": 2,
+      "findings_produced": 2,
+      "expected": 2,
+      "true_positives": 2,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    }
+  ]
+}

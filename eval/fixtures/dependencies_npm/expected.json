@@ -1,0 +1,9 @@
+{
+  "expected_findings": [
+    {"scanner": "dependencies", "rule": "typosquat_suspect", "path_glob": "package.json"},
+    {"scanner": "dependencies", "rule": "non_registry_dep", "path_glob": "package.json"},
+    {"scanner": "dependencies", "rule": "floating_version", "path_glob": "package.json"},
+    {"scanner": "dependencies", "rule": "install_hook", "path_glob": "package.json"}
+  ],
+  "forbidden_findings": []
+}

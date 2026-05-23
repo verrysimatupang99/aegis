@@ -1,0 +1,43 @@
+{
+  "$schema": "https://raw.githubusercontent.com/modelcontextprotocol/servers/main/schema.json",
+  "name": "aegis",
+  "displayName": "Aegis",
+  "description": "Transparent, constitution-bound defensive security copilot. Scans code/files for secrets, obfuscated loaders, suspicious deps, and filesystem hygiene. Charter-gated; defensive only.",
+  "version": "0.1.0",
+  "license": "MIT",
+  "categories": [
+    "security",
+    "audit",
+    "devops"
+  ],
+  "homepage": "https://github.com/verrysimatupang99/aegis",
+  "repository": "https://github.com/verrysimatupang99/aegis",
+  "transports": [
+    "stdio"
+  ],
+  "command": {
+    "stdio": {
+      "command": "aegis-mcp",
+      "args": [],
+      "env": {
+        "AEGIS_HOME": "${workspaceFolder}"
+      }
+    }
+  },
+  "tools": [
+    "scan_path",
+    "report_findings",
+    "explain_finding",
+    "show_charter",
+    "tail_journal"
+  ],
+  "resources": [
+    "aegis://charter",
+    "aegis://index/stats"
+  ],
+  "safety": {
+    "scope": "defensive_only",
+    "charter_path": "data/mythos.yaml",
+    "outbound_network": "denied_by_default"
+  }
+}

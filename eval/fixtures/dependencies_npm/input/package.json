@@ -1,0 +1,11 @@
+{
+  "name": "demo",
+  "dependencies": {
+    "lodas": "1.0.0",
+    "weird-thing": "github:someone/random#main",
+    "react": "*"
+  },
+  "scripts": {
+    "postinstall": "node hook.js"
+  }
+}

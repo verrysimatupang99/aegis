@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aegis-sec"
+version = "0.1.0"
+description = "Aegis - a transparent, constitution-bound defensive security copilot with MCP server"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "mrtrickster99" }]
+keywords = ["security", "ai", "mcp", "defensive", "audit", "copilot", "claude", "codex"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Intended Audience :: System Administrators",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: POSIX :: Linux",
+  "Operating System :: MacOS",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Security",
+]
+dependencies = [
+  "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+llm = ["anthropic>=0.39"]
+yara = ["yara-python>=4.5"]
+dev = ["pytest>=8.0"]
+all = [
+  "anthropic>=0.39",
+  "yara-python>=4.5",
+  "pytest>=8.0",
+]
+
+[project.scripts]
+aegis = "aegis.cli.main:main"
+aegis-mcp = "aegis.mcp.server:serve_stdio"
+
+[project.urls]
+Homepage = "https://github.com/verrysimatupang99/aegis"
+Source = "https://github.com/verrysimatupang99/aegis"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

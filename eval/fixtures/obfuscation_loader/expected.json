@@ -1,0 +1,8 @@
+{
+  "expected_findings": [
+    {"scanner": "obfuscation", "rule": "obfuscated_loader", "path_glob": "loader.js"}
+  ],
+  "forbidden_findings": [
+    {"scanner": "obfuscation", "path_glob": "clean.js"}
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "aegis": {
+      "command": "/opt/aegis/.venv/bin/aegis-mcp",
+      "args": [],
+      "env": { "AEGIS_HOME": "/opt/aegis" }
+    }
+  }
+}

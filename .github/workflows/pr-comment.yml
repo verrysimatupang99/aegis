@@ -1,0 +1,112 @@
+name: Aegis PR diff comment
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  diff-comment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install Aegis
+        run: pip install -e .[dev]
+
+      - name: Build current index
+        run: |
+          rm -rf data/index.sqlite
+          aegis scan src --max-bytes 4194304 || true
+
+      - name: Diff against committed baseline (if any)
+        id: aegis-diff
+        run: |
+          if [ -f baselines/index.sqlite ]; then
+            python -m aegis.cli.diff baselines/index.sqlite data/index.sqlite \
+              --json /tmp/diff.json \
+              --fail-on critical,high || echo "gate=fail" >> "$GITHUB_OUTPUT"
+            echo "diff_exists=1" >> "$GITHUB_OUTPUT"
+          else
+            echo "diff_exists=0" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Render comment body
+        if: steps.aegis-diff.outputs.diff_exists == '1'
+        run: |
+          python - <<'PY'
+          import json, os, pathlib
+          d = json.loads(pathlib.Path('/tmp/diff.json').read_text())
+          added = d.get('added', [])
+          removed = d.get('removed', [])
+          changed = d.get('severity_changed', [])
+          lines = ["## Aegis defensive diff", ""]
+          if not (added or removed or changed):
+              lines.append("No new findings vs baseline. ✅")
+          if added:
+              lines.append(f"### Added ({len(added)})")
+              for f in added[:30]:
+                  loc = f":{f['line']}" if f.get('line') else ''
+                  lines.append(f"- **{f['severity']}** `{f['scanner']}/{f['rule']}` `{f['path']}{loc}`")
+              if len(added) > 30:
+                  lines.append(f"- _(+{len(added)-30} more)_")
+          if removed:
+              lines.append("")
+              lines.append(f"### Removed ({len(removed)})")
+              for f in removed[:10]:
+                  lines.append(f"- {f['severity']} `{f['scanner']}/{f['rule']}` `{f['path']}`")
+          if changed:
+              lines.append("")
+              lines.append(f"### Severity changed ({len(changed)})")
+              for c in changed[:10]:
+                  lines.append(f"- `{c['scanner']}/{c['rule']}` {c['from']} → {c['to']} `{c['path']}`")
+          gate = "${{ steps.aegis-diff.outputs.gate }}"
+          lines.append("")
+          if gate == "fail":
+              lines.append("> ❌ Gate **failed**: new findings at gating severities.")
+          else:
+              lines.append("> ✅ Gate passed at the configured severities.")
+          pathlib.Path('/tmp/comment.md').write_text("\n".join(lines))
+          PY
+
+      - name: Post or update PR comment
+        if: steps.aegis-diff.outputs.diff_exists == '1'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const body = fs.readFileSync('/tmp/comment.md', 'utf8');
+            const marker = '<!-- aegis-diff-marker -->';
+            const fullBody = `${marker}\n${body}`;
+            const { owner, repo } = context.repo;
+            const issue_number = context.payload.pull_request.number;
+            const { data: comments } = await github.rest.issues.listComments({
+              owner, repo, issue_number, per_page: 100,
+            });
+            const existing = comments.find(c => c.body && c.body.startsWith(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner, repo, comment_id: existing.id, body: fullBody,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner, repo, issue_number, body: fullBody,
+              });
+            }
+
+      - name: Fail the gate if drift detected
+        if: steps.aegis-diff.outputs.gate == 'fail'
+        run: |
+          echo "Aegis gate failed: new findings at gating severities."
+          exit 1

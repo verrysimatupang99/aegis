@@ -1,0 +1,9 @@
+{
+  "expected_findings": [
+    {"scanner": "secrets", "rule": "github_pat", "path_glob": "leak.env"},
+    {"scanner": "secrets", "rule": "openai_key", "path_glob": "leak.env"}
+  ],
+  "forbidden_findings": [
+    {"scanner": "secrets", "path_glob": "clean.txt"}
+  ]
+}

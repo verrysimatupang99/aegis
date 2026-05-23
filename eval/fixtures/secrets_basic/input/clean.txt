@@ -1,0 +1,2 @@
+Just a regular text file with no secrets.
+contact: [email protected]
