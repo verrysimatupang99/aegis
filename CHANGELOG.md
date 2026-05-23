@@ -4,6 +4,24 @@ All notable changes to Aegis are documented here. Format is loosely
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.3] — 2026-05-23
+
+### Fixed (false positives surfaced by scanning a Grafana checkout)
+- **secrets/private_key_block** no longer fires on label-only content
+  such as `<textarea placeholder="-----BEGIN ... -----">` or docs that
+  mention the PEM header. The pattern now requires an actual PEM body
+  (≥100 base64 characters between matching BEGIN and END markers).
+- **obfuscation/obfuscated_loader** skips minified vendor bundles. Files
+  whose name contains `.min.` or ends in `.bundle.js`, or whose path
+  contains `min/`, `vendor/`, or `monaco`/`monaco-editor`, are no longer
+  flagged. Minified Monaco editor JS legitimately uses long lines, `eval(`,
+  and `Function()`; treating it as a packer was wrong.
+
+### Tests
+- New `tests/test_v013_fp_regressions.py` (4 tests) pinning both fixes:
+  label-only PEM no longer fires; real PEM body still fires; minified
+  bundles are skipped; real packer JS is still detected.
+
 ## [0.1.2] — 2026-05-23
 
 ### Added

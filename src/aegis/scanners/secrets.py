@@ -33,8 +33,18 @@ PATTERNS: list[tuple[str, str, re.Pattern[str]]] = [
      re.compile(r"\bsk-ant-[A-Za-z0-9_-]{20,}\b")),
     ("google_api_key", "high",
      re.compile(r"\bAIza[0-9A-Za-z_-]{35}\b")),
+    # The previous regex matched any literal "-----BEGIN ... PRIVATE KEY-----"
+    # which fired on docs and HTML/JSX templates that mention the label.
+    # We now require an actual PEM body: at least 100 base64 characters
+    # between the BEGIN and END markers.
     ("private_key_block", "critical",
-     re.compile(r"-----BEGIN ([A-Z ]*)PRIVATE KEY-----")),
+     re.compile(
+         r"-----BEGIN ([A-Z ]*)PRIVATE KEY-----"
+         r"[\r\n\s]+"
+         r"([A-Za-z0-9+/=\s]{100,})"
+         r"[\r\n\s]*-----END \1PRIVATE KEY-----",
+         re.DOTALL,
+     )),
     ("jwt", "medium",
      re.compile(r"\beyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]{8,}\b")),
     ("generic_bearer", "medium",

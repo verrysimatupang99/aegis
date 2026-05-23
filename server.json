@@ -3,7 +3,7 @@
   "name": "io.github.verrysimatupang99/aegis",
   "title": "Aegis",
   "description": "Charter-bound defensive security copilot: secrets, obfuscation, deps, Dockerfile, IaC scans.",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "repository": {
     "url": "https://github.com/verrysimatupang99/aegis",
     "source": "github"
@@ -12,7 +12,7 @@
     {
       "registryType": "pypi",
       "identifier": "aegis-sec",
-      "version": "0.1.2",
+      "version": "0.1.3",
       "transport": {
         "type": "stdio"
       },

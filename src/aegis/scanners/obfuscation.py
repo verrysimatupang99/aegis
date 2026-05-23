@@ -91,6 +91,22 @@ class ObfuscationScanner:
         if not treat_as_code:
             return
 
+        # Minified vendor bundles legitimately contain long lines, eval(),
+        # Function() and high entropy. They are not packers; they are build
+        # output. Exclude obvious minified paths to keep the scanner focused
+        # on hand-written or runtime-extracted code.
+        name = path.name.lower()
+        parts = {p.lower() for p in path.parts}
+        if (
+            ".min." in name
+            or name.endswith(".bundle.js")
+            or "min" in parts
+            or "vendor" in parts
+            or "monaco-editor" in parts
+            or "monaco" in parts
+        ):
+            return
+
         signals: list[str] = []
         details: dict[str, object] = {"size": stat.st_size}
 
