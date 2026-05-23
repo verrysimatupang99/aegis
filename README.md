@@ -2,6 +2,12 @@
 
 # Aegis
 
+[![PyPI](https://img.shields.io/pypi/v/aegis-sec?label=aegis-sec)](https://pypi.org/project/aegis-sec/)
+[![MCP Registry](https://img.shields.io/badge/MCP%20Registry-io.github.verrysimatupang99%2Faegis-7c3aed)](https://registry.modelcontextprotocol.io/v0/servers?search=io.github.verrysimatupang99/aegis)
+[![CI](https://github.com/verrysimatupang99/aegis/actions/workflows/ci.yml/badge.svg)](https://github.com/verrysimatupang99/aegis/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
+
 A transparent, constitution-bound defensive security copilot. Ships a CLI, an
 MCP server (Claude Desktop, Claude Code, Codex CLI/Desktop, Cursor, Continue,
 Zed), an optional cloud or local LLM advisor, an HTML report exporter, and an
@@ -68,25 +74,26 @@ baseline; recipients run `aegis report` against it without rescanning.
 
 ## Connecting to MCP clients
 
-See [`docs/clients/README.md`](docs/clients/README.md). Sample configs are in
-[`docs/clients/examples/`](docs/clients/examples/).
-
-Quick version (assuming Aegis is installed at `/opt/aegis`):
+Aegis is published to the MCP Registry as
+`io.github.verrysimatupang99/aegis` and to PyPI as
+[`aegis-sec`](https://pypi.org/project/aegis-sec/). You don't need to clone
+this repo to use it. Same shape works in Claude Desktop, Claude Code, Codex,
+Cursor, Continue, and Zed:
 
 ```jsonc
-// ~/Library/Application Support/Claude/claude_desktop_config.json
 {
   "mcpServers": {
     "aegis": {
-      "command": "/opt/aegis/.venv/bin/aegis-mcp",
-      "env": { "AEGIS_HOME": "/opt/aegis" }
+      "command": "uvx",
+      "args": ["--from", "aegis-sec", "aegis-mcp"]
     }
   }
 }
 ```
 
-The same shape works for Claude Code (`~/.config/claude-code/mcp.json`) and
-Codex (`~/.codex/mcp.json`).
+Codex uses `servers` instead of `mcpServers` but the command is identical.
+See [`docs/clients/README.md`](docs/clients/README.md) for per-client config
+file paths and verification steps.
 
 ## Design rules
 

@@ -1,9 +1,9 @@
 {
   "servers": {
     "aegis": {
-      "command": "/opt/aegis/.venv/bin/aegis-mcp",
-      "transport": "stdio",
-      "env": { "AEGIS_HOME": "/opt/aegis" }
+      "command": "uvx",
+      "args": ["--from", "aegis-sec", "aegis-mcp"],
+      "transport": "stdio"
     }
   }
 }

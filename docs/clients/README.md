@@ -1,98 +1,95 @@
 # Connecting Aegis to MCP clients
 
-Aegis ships an MCP server over stdio. Any client that supports MCP stdio
-servers can plug it in. The command is the same across all clients:
+Aegis is published to the MCP Registry as
+`io.github.verrysimatupang99/aegis` and to PyPI as `aegis-sec`. You don't
+need to clone this repo to use it.
 
-```
-aegis-mcp
-```
+## Recommended: `uvx` one-liner
 
-Set `AEGIS_HOME` to the project root if you run the server from elsewhere
-(needed so it can locate `data/mythos.yaml` and the shared index).
+[`uv`](https://docs.astral.sh/uv/) (or `uvx`) installs the package into a
+disposable virtualenv on demand. Same shape works in every MCP client:
 
-The configs below assume Aegis is installed in a virtualenv at
-`/opt/aegis/.venv` and the project root is `/opt/aegis`. Adjust paths.
-
-## Claude Desktop
-
-Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS)
-or `%APPDATA%\Claude\claude_desktop_config.json` (Windows):
-
-```json
+```jsonc
 {
   "mcpServers": {
     "aegis": {
-      "command": "/opt/aegis/.venv/bin/aegis-mcp",
-      "args": [],
-      "env": {
-        "AEGIS_HOME": "/opt/aegis"
-      }
+      "command": "uvx",
+      "args": ["--from", "aegis-sec", "aegis-mcp"]
     }
   }
 }
 ```
 
-Restart Claude Desktop. The Aegis tools appear under the hammer icon.
+If you want to scan a specific project, set the `AEGIS_HOME` env var so the
+journal and the SQLite index land inside that project:
 
-## Claude Code (CLI)
-
-Add to `~/.config/claude-code/mcp.json`:
-
-```json
+```jsonc
 {
   "mcpServers": {
     "aegis": {
-      "command": "/opt/aegis/.venv/bin/aegis-mcp",
-      "env": { "AEGIS_HOME": "/opt/aegis" }
+      "command": "uvx",
+      "args": ["--from", "aegis-sec", "aegis-mcp"],
+      "env": { "AEGIS_HOME": "/path/to/your/project" }
     }
   }
 }
 ```
 
-Or, project-scoped, drop a `.mcp.json` at the repo root with the same shape.
+## Alternative: `pip install`
 
-## Codex CLI / Codex Desktop (OpenAI)
+```bash
+pipx install aegis-sec        # or: pip install --user aegis-sec
+which aegis-mcp               # confirm it's on PATH
+```
 
-Codex CLI reads MCP servers from `~/.codex/mcp.json`:
+```jsonc
+{
+  "mcpServers": {
+    "aegis": {
+      "command": "aegis-mcp"
+    }
+  }
+}
+```
 
-```json
+## Per-client paths
+
+| Client                | Config file                                                                  |
+|-----------------------|------------------------------------------------------------------------------|
+| Claude Desktop (mac)  | `~/Library/Application Support/Claude/claude_desktop_config.json`            |
+| Claude Desktop (Win)  | `%APPDATA%\Claude\claude_desktop_config.json`                                |
+| Claude Code           | `~/.config/claude-code/mcp.json` (or repo-scoped `.mcp.json`)                |
+| Codex CLI / Desktop   | `~/.codex/mcp.json` (key is `servers`, not `mcpServers`)                     |
+| Cursor                | Settings → MCP                                                               |
+| Continue              | `~/.continue/config.yaml` under `mcpServers`                                 |
+| Zed                   | `~/.config/zed/settings.json` under `context_servers`                        |
+
+Codex uses a slightly different shape:
+
+```jsonc
 {
   "servers": {
     "aegis": {
-      "command": "/opt/aegis/.venv/bin/aegis-mcp",
-      "transport": "stdio",
-      "env": { "AEGIS_HOME": "/opt/aegis" }
+      "command": "uvx",
+      "args": ["--from", "aegis-sec", "aegis-mcp"],
+      "transport": "stdio"
     }
   }
 }
 ```
 
-Codex Desktop uses the same shape under Settings > MCP servers.
+After saving, restart the client. Aegis tools appear under the hammer icon
+(Claude Desktop / Code) or the MCP panel (Cursor / Codex).
 
-## Cursor / Continue / Zed
+## Verifying
 
-These clients accept the same generic stdio shape:
+Ask the model:
 
-```json
-{
-  "mcpServers": {
-    "aegis": {
-      "command": "/opt/aegis/.venv/bin/aegis-mcp",
-      "env": { "AEGIS_HOME": "/opt/aegis" }
-    }
-  }
-}
-```
+> Use the `show_charter` tool from aegis.
 
-## Verifying the connection
+You should see the charter fingerprint and the list of hard rules. Then:
 
-After restarting the client, ask the model:
-
-> Use the show_charter tool from aegis.
-
-You should see the charter fingerprint and the list of hard rules. Then try:
-
-> Run scan_path against /path/to/some/repo and report critical findings.
+> Run `scan_path` against /path/to/some/repo and report critical findings.
 
 Every call passes through the policy engine and is journaled to
 `$AEGIS_HOME/.aegis/journal/`.

@@ -1,8 +1,8 @@
 {
   "mcpServers": {
     "aegis": {
-      "command": "/opt/aegis/.venv/bin/aegis-mcp",
-      "env": { "AEGIS_HOME": "/opt/aegis" }
+      "command": "uvx",
+      "args": ["--from", "aegis-sec", "aegis-mcp"]
     }
   }
 }
