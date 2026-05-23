@@ -28,17 +28,34 @@ class ScanContext:
     )
 
     def iter_files(self) -> Iterable[Path]:
-        for path in self.root.rglob("*"):
-            if not path.is_file():
-                continue
-            if any(part in self.excluded_dirs for part in path.parts):
-                continue
-            try:
-                if path.stat().st_size > self.max_bytes * 16:
+        """Yield files under ``root``, pruning excluded dirs *before* descent.
+
+        Using :func:`os.walk` with in-place ``dirs`` mutation lets us avoid
+        recursing into 10+ GB caches like ``target/``, ``node_modules/``,
+        ``models/`` entirely. Previously :py:meth:`Path.rglob` would still
+        descend, which made whole-workspace scans take many minutes.
+        """
+        import os
+
+        excluded = set(self.excluded_dirs)
+        cap = self.max_bytes * 16
+        for dirpath, dirnames, filenames in os.walk(
+            self.root, followlinks=self.follow_symlinks
+        ):
+            # Prune: drop any subdir whose basename is excluded BEFORE descent.
+            dirnames[:] = [d for d in dirnames if d not in excluded]
+            for fname in filenames:
+                full = Path(dirpath) / fname
+                try:
+                    st = full.lstat()
+                except OSError:
                     continue
-            except OSError:
-                continue
-            yield path
+                # Skip symlinked files unless asked.
+                if not self.follow_symlinks and (st.st_mode & 0o170000) == 0o120000:
+                    continue
+                if st.st_size > cap:
+                    continue
+                yield full
 
 
 class Scanner(Protocol):

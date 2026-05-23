@@ -75,16 +75,25 @@ def run_scan(
     merged = tuple(dict.fromkeys(base_excluded + tuple(extra_excluded_dirs)))
     ctx = ScanContext(root=root, max_bytes=max_bytes, excluded_dirs=merged)
 
+    # We deliberately do NOT call policy.check_action() per file. Whole-
+    # workspace scans index tens of thousands of files; each policy call
+    # writes a JSON line to the journal, which is the dominant cost. We
+    # journal one 'fs.read.batch' summary at the end instead.
     files = 0
+    read_errors = 0
     for path in ctx.iter_files():
         try:
-            policy.check_action("fs.read", {"path": str(path)})
             size, sha = _hash_file(path)
             mime, _ = mimetypes.guess_type(path.name)
             index.upsert_file(str(path), size, sha, path.stat().st_mtime, mime)
             files += 1
         except OSError:
+            read_errors += 1
             continue
+    policy.journal.write(
+        "fs.read.batch",
+        {"root": str(root), "files_indexed": files, "read_errors": read_errors},
+    )
 
     added = 0
     skipped = 0
