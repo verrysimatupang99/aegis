@@ -67,10 +67,13 @@ def run_scan(
     policy: PolicyEngine,
     scanners: Iterable[Scanner] | None = None,
     max_bytes: int = 8 * 1024 * 1024,
+    extra_excluded_dirs: tuple[str, ...] = (),
 ) -> ScanReport:
     root = root.resolve()
-    policy.check_action("scan.start", {"root": str(root)})
-    ctx = ScanContext(root=root, max_bytes=max_bytes)
+    policy.check_action("scan.start", {"root": str(root), "extra_excluded": list(extra_excluded_dirs)})
+    base_excluded = ScanContext.__dataclass_fields__["excluded_dirs"].default
+    merged = tuple(dict.fromkeys(base_excluded + tuple(extra_excluded_dirs)))
+    ctx = ScanContext(root=root, max_bytes=max_bytes, excluded_dirs=merged)
 
     files = 0
     for path in ctx.iter_files():

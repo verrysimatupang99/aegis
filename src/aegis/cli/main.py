@@ -57,7 +57,14 @@ def cmd_scan(args: argparse.Namespace) -> int:
     if not root.exists():
         print(f"aegis: path not found: {root}", file=sys.stderr)
         return 2
-    report = run_scan(root=root, index=index, policy=policy, max_bytes=args.max_bytes)
+    extras = tuple(args.exclude or ())
+    report = run_scan(
+        root=root,
+        index=index,
+        policy=policy,
+        max_bytes=args.max_bytes,
+        extra_excluded_dirs=extras,
+    )
     print(f"Aegis charter: {charter.identity.get('name','Aegis')} ({charter.fingerprint})")
     print(f"Indexed {report.files_indexed} files")
     print(f"Findings added: {report.findings_added} (skipped dupes: {report.findings_skipped})")
@@ -198,6 +205,11 @@ def build_parser() -> argparse.ArgumentParser:
     s_scan = sub.add_parser("scan", help="scan a directory")
     s_scan.add_argument("path", help="directory to scan")
     s_scan.add_argument("--max-bytes", type=int, default=8 * 1024 * 1024)
+    s_scan.add_argument(
+        "--exclude",
+        action="append",
+        help="directory name to skip (matched against any path component); repeatable",
+    )
     s_scan.set_defaults(func=cmd_scan)
 
     s_report = sub.add_parser("report", help="report findings from the shared index")

@@ -17,6 +17,14 @@ class ScanContext:
     excluded_dirs: tuple[str, ...] = (
         ".git", "node_modules", ".venv", "venv", "__pycache__",
         "dist", "build", ".aegis",
+        # heavy build/cache trees encountered when scanning
+        # whole-workspace roots like ~/Documents/Coding
+        "target", ".next", ".nuxt", ".turbo", ".parcel-cache",
+        "vendor", "coverage", ".cache", ".gradle", ".idea",
+        ".pytest_cache", ".mypy_cache", ".ruff_cache",
+        "site-packages",
+        # large generated/binary content roots
+        "gen", "artifacts", "models",
     )
 
     def iter_files(self) -> Iterable[Path]:
