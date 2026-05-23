@@ -1,0 +1,50 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.verrysimatupang99/aegis",
+  "title": "Aegis",
+  "description": "Transparent, constitution-bound defensive security copilot. Scans code/files for secrets, obfuscated loaders, suspicious dependencies, Dockerfile/IaC misconfigurations, and filesystem hygiene. All actions gated by an immutable charter; defensive-only by design.",
+  "version": "0.1.0",
+  "repository": {
+    "url": "https://github.com/verrysimatupang99/aegis",
+    "source": "github"
+  },
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "aegis-sec",
+      "version": "0.1.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "runtimeHint": "python",
+      "runtimeArguments": [
+        {
+          "type": "named",
+          "name": "--from",
+          "value": "aegis-sec",
+          "isRequired": true
+        }
+      ],
+      "packageArguments": [
+        {
+          "type": "positional",
+          "value": "aegis-mcp",
+          "isRequired": true
+        }
+      ],
+      "environmentVariables": [
+        {
+          "name": "AEGIS_HOME",
+          "description": "Project root containing data/mythos.yaml. Defaults to current working directory.",
+          "isRequired": false
+        },
+        {
+          "name": "ANTHROPIC_API_KEY",
+          "description": "Optional. Only needed if you call the `aegis advise` cloud LLM path.",
+          "isRequired": false,
+          "isSecret": true
+        }
+      ]
+    }
+  ]
+}

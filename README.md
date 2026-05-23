@@ -1,3 +1,5 @@
+<!-- mcp-name: io.github.verrysimatupang99/aegis -->
+
 # Aegis
 
 A transparent, constitution-bound defensive security copilot. Ships a CLI, an
